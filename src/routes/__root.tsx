@@ -1,19 +1,26 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { NotFound } from '../errors/NotFound'
+import { NavBar } from '../components/navigations/NavBar'
+import { shouldShowNavBar } from '../utils/navigation-config'
 
 export const Route = createRootRoute({
-    component: () => (
+    component: RootComponent,
+    notFoundComponent: NotFound,
+})
+
+function RootComponent() {
+    const { location } = useRouterState()
+    const showNavBar = shouldShowNavBar(location.pathname)
+    return (
         <>
-            <div className="p-2 flex gap-2">
-                <Link to="/" className="[&.active]:font-bold">
-                    Home
-                </Link>{' '}
+            {showNavBar && <NavBar />}
+            <div className="max-w-screen-2xl mx-auto">
+                <Outlet />
             </div>
-            <hr />
-            <Outlet />
             <TanStackRouterDevtools />
             <ReactQueryDevtools />
         </>
-    ),
-})
+    )
+}
